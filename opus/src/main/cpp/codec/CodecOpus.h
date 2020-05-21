@@ -1,5 +1,5 @@
 //
-// Created by User on 21.05.2020.
+// Created by Loboda Alexey on 21.05.2020.
 //
 
 #ifndef OPUS_CODECOPUS_H
