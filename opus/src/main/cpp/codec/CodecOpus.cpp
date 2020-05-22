@@ -2,8 +2,8 @@
 // Created by Loboda Alexey on 21.05.2020.
 //
 
-#include <opus.h>
 #include "CodecOpus.h"
+#include "../utils/SamplesConverter.h"
 #include "../utils/logger.h"
 
 //
@@ -55,12 +55,14 @@ std::vector<short> CodecOpus::encode(short *shorts, int length, int frameSize) {
     int ret = checkForNull("encode", true);
     if (ret < 0) return result;
 
-    int maxBytesCount = sizeof(unsigned char) * length * 3;
+    int maxBytesCount = sizeof(unsigned char) * 1024;
     unsigned char *outBuffer = (unsigned char*) malloc((size_t) maxBytesCount);
 
     int resultLength = opus_encode(encoder, shorts, frameSize, outBuffer, maxBytesCount);
     if (resultLength <= 0) return result;
+
     std::copy(&outBuffer[0], &outBuffer[resultLength], std::back_inserter(result));
+    free(outBuffer);
     return result;
 }
 
@@ -70,12 +72,16 @@ std::vector<uint8_t> CodecOpus::encode(uint8_t *bytes, int length, int frameSize
     int ret = checkForNull("encode", true);
     if (ret < 0) return result;
 
-    int maxBytesCount = sizeof(uint8_t) * length * 3;
-    uint8_t *outBuffer = (uint8_t*) malloc((size_t) maxBytesCount);
+    int maxBytesCount = sizeof(unsigned char) * 1024;
+    unsigned char*outBuffer = (unsigned char*) malloc((size_t) maxBytesCount);
 
-    int resultLength = opus_encode(encoder, (const opus_int16*) bytes, frameSize, outBuffer, maxBytesCount);
+  // std::vector<short> inData = SamplesConverter::convert(&bytes, length);
+
+    int resultLength = opus_encode(encoder, (opus_int16 *) bytes, frameSize, outBuffer, maxBytesCount);
     if (resultLength <= 0) return result;
+
     std::copy(&outBuffer[0], &outBuffer[resultLength], std::back_inserter(result));
+    free(outBuffer);
     return result;
 }
 
@@ -117,12 +123,12 @@ std::vector<short> CodecOpus::decode(short *shorts, int length, int frameSize) {
     int ret = checkForNull("decode", false);
     if (ret < 0) return result;
 
-    int maxBytesCount = sizeof(short) * length * 3;
-    short *outBuffer = (short*) malloc((size_t) maxBytesCount);
+    opus_int16 *outBuffer = (opus_int16*) malloc(sizeof(opus_int16) * 1024);
 
     int resultLength = opus_decode(decoder, (const unsigned char *) shorts, length, outBuffer, frameSize, 0); // FIXME it's necessary to convert shorts* to unsigned char*
     if (resultLength <= 0) return result;
     std::copy(&outBuffer[0], &outBuffer[resultLength], std::back_inserter(result));
+    free(outBuffer);
     return result;
 }
 
@@ -132,12 +138,16 @@ std::vector<uint8_t> CodecOpus::decode(uint8_t *bytes, int length, int frameSize
     int ret = checkForNull("decode", false);
     if (ret < 0) return result;
 
-    int maxBytesCount = sizeof(uint8_t) * length * 3;
-    uint8_t *outBuffer = (uint8_t*) malloc((size_t) maxBytesCount);
+    opus_int16 *outBuffer = (opus_int16*) malloc(sizeof(opus_int16) * 1024);
 
-    int resultLength = opus_decode(decoder, bytes, length, (short *) outBuffer, frameSize, 0); // FIXME it's necessary to convert bytes* to short*
+    int resultLength = opus_decode(decoder, bytes, length, outBuffer, frameSize, 0); // FIXME it's necessary to convert bytes* to short*
     if (resultLength <= 0) return result;
+
+  //  result = SamplesConverter::convert(&outBuffer, resultLength);
+
     std::copy(&outBuffer[0], &outBuffer[resultLength], std::back_inserter(result));
+
+    free(outBuffer);
     return result;
 }
 
@@ -158,4 +168,11 @@ int CodecOpus::checkForNull(const char *methodName, bool isEncoder) {
 CodecOpus::~CodecOpus() {
     encoderRelease();
     decoderRelease();
+}
+
+void printArray(uint8_t **array, int length) {
+    for(int i = 0; i < length; i++) {
+        short v = (*array)[i];
+        if (v > INT8_MAX || v < INT8_MIN) LOGD("weffwwef", "v: %d", v);
+    }
 }

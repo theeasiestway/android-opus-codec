@@ -18,6 +18,7 @@ add_library( # Sets the name of the library.
 
              # Provides a relative path to your source file(s).
              codec/CodecOpus.cpp
+             utils/SamplesConverter.cpp
              easyopus.cpp)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)

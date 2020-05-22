@@ -32,12 +32,12 @@ Java_com_theeasiestway_opus_Opus_encoderSetComplexity(JNIEnv *env, jobject thiz,
 extern "C"
 JNIEXPORT jbyteArray JNICALL
 Java_com_theeasiestway_opus_Opus_encode___3BII(JNIEnv *env, jobject thiz, jbyteArray bytes, jint length, jint frame_size) {
-    jbyte* nativeBytes = env->GetByteArrayElements(bytes, 0);
+    jbyte *nativeBytes = env->GetByteArrayElements(bytes, 0);
     std::vector<uint8_t> encodedData = codec.encode((uint8_t *) nativeBytes, length, frame_size);
     int encodedSize = encodedData.size();
     if (encodedSize <= 0) return nullptr;
 
-    jbyteArray result = env->NewByteArray(encodedData.size());
+    jbyteArray result = env->NewByteArray(encodedSize);
     env->SetByteArrayRegion(result, 0, encodedSize, (jbyte *) encodedData.data());
     env->ReleaseByteArrayElements(bytes, nativeBytes, 0);
 
@@ -47,12 +47,12 @@ Java_com_theeasiestway_opus_Opus_encode___3BII(JNIEnv *env, jobject thiz, jbyteA
 extern "C"
 JNIEXPORT jshortArray JNICALL
 Java_com_theeasiestway_opus_Opus_encode___3SII(JNIEnv *env, jobject thiz, jshortArray shorts, jint length, jint frame_size) {
-    jshort * nativeShorts = env->GetShortArrayElements(shorts, 0);
+    jshort *nativeShorts = env->GetShortArrayElements(shorts, 0);
     std::vector<short> encodedData = codec.encode(nativeShorts, length, frame_size);
     int encodedSize = encodedData.size();
     if (encodedSize <= 0) return nullptr;
 
-    jshortArray result = env->NewShortArray(encodedData.size());
+    jshortArray result = env->NewShortArray(encodedSize);
     env->SetShortArrayRegion(result, 0, encodedSize, encodedData.data());
     env->ReleaseShortArrayElements(shorts, nativeShorts, 0);
 
@@ -78,12 +78,12 @@ Java_com_theeasiestway_opus_Opus_decoderInit(JNIEnv *env, jobject thiz, jint sam
 extern "C"
 JNIEXPORT jbyteArray JNICALL
 Java_com_theeasiestway_opus_Opus_decode___3BII(JNIEnv *env, jobject thiz, jbyteArray bytes, jint length, jint frame_size) {
-    jbyte* nativeBytes = env->GetByteArrayElements(bytes, 0);
+    jbyte *nativeBytes = env->GetByteArrayElements(bytes, 0);
     std::vector<uint8_t> encodedData = codec.decode((uint8_t *) nativeBytes, length, frame_size);
     int encodedSize = encodedData.size();
     if (encodedSize <= 0) return nullptr;
 
-    jbyteArray result = env->NewByteArray(encodedData.size());
+    jbyteArray result = env->NewByteArray(encodedSize);
     env->SetByteArrayRegion(result, 0, encodedSize, (jbyte *) encodedData.data());
     env->ReleaseByteArrayElements(bytes, nativeBytes, 0);
 
@@ -93,12 +93,12 @@ Java_com_theeasiestway_opus_Opus_decode___3BII(JNIEnv *env, jobject thiz, jbyteA
 extern "C"
 JNIEXPORT jshortArray JNICALL
 Java_com_theeasiestway_opus_Opus_decode___3SII(JNIEnv *env, jobject thiz, jshortArray shorts, jint length, jint frame_size) {
-    jshort * nativeShorts = env->GetShortArrayElements(shorts, 0);
+    jshort *nativeShorts = env->GetShortArrayElements(shorts, 0);
     std::vector<short> encodedData = codec.decode(nativeShorts, length, frame_size);
     int encodedSize = encodedData.size();
     if (encodedSize <= 0) return nullptr;
 
-    jshortArray result = env->NewShortArray(encodedData.size());
+    jshortArray result = env->NewShortArray(encodedSize);
     env->SetShortArrayRegion(result, 0, encodedSize, encodedData.data());
     env->ReleaseShortArrayElements(shorts, nativeShorts, 0);
 

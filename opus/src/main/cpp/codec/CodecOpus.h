@@ -7,6 +7,7 @@
 
 #include <cstdint>
 #include <vector>
+#include <opus.h>
 
 class CodecOpus {
 
