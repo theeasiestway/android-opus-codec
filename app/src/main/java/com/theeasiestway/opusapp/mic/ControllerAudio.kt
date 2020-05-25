@@ -67,6 +67,13 @@ object ControllerAudio {
         return null
     }
 
+    fun getFrameShort(): ShortArray? {
+        val frame = ShortArray(frameSize)
+        val count = recorder.read(frame, 0, frameSize)
+        if (count > 0) return frame
+        return null
+    }
+
     fun onMicStateChange(micEnabled: Boolean) {
         ControllerAudio.micEnabled = micEnabled
     }

@@ -50,20 +50,10 @@ int CodecOpus::encoderSetComplexity(int complexity) {
 }
 
 std::vector<short> CodecOpus::encode(short *shorts, int length, int frameSize) {
-    std::vector<short> result;
-
-    int ret = checkForNull("encode", true);
-    if (ret < 0) return result;
-
-    int maxBytesCount = sizeof(unsigned char) * 1024;
-    unsigned char *outBuffer = (unsigned char*) malloc((size_t) maxBytesCount);
-
-    int resultLength = opus_encode(encoder, shorts, frameSize, outBuffer, maxBytesCount);
-    if (resultLength <= 0) return result;
-
-    std::copy(&outBuffer[0], &outBuffer[resultLength], std::back_inserter(result));
-    free(outBuffer);
-    return result;
+    std::vector<uint8_t> bytes = SamplesConverter::convert(&shorts, length);
+    std::vector<uint8_t> encoded = encode(bytes.data(), bytes.size(), frameSize);
+    uint8_t *data = encoded.data();
+    return SamplesConverter::convert(&data, encoded.size());
 }
 
 std::vector<uint8_t> CodecOpus::encode(uint8_t *bytes, int length, int frameSize) {
@@ -73,9 +63,7 @@ std::vector<uint8_t> CodecOpus::encode(uint8_t *bytes, int length, int frameSize
     if (ret < 0) return result;
 
     int maxBytesCount = sizeof(unsigned char) * 1024;
-    unsigned char*outBuffer = (unsigned char*) malloc((size_t) maxBytesCount);
-
-  // std::vector<short> inData = SamplesConverter::convert(&bytes, length);
+    unsigned char *outBuffer = (unsigned char*) malloc((size_t) maxBytesCount);
 
     int resultLength = opus_encode(encoder, (opus_int16 *) bytes, frameSize, outBuffer, maxBytesCount);
     if (resultLength <= 0) return result;
@@ -118,18 +106,10 @@ int CodecOpus::decoderInit(int sampleRate, int numChannels) {
 }
 
 std::vector<short> CodecOpus::decode(short *shorts, int length, int frameSize) {
-    std::vector<short> result;
-
-    int ret = checkForNull("decode", false);
-    if (ret < 0) return result;
-
-    opus_int16 *outBuffer = (opus_int16*) malloc(sizeof(opus_int16) * 1024);
-
-    int resultLength = opus_decode(decoder, (const unsigned char *) shorts, length, outBuffer, frameSize, 0); // FIXME it's necessary to convert shorts* to unsigned char*
-    if (resultLength <= 0) return result;
-    std::copy(&outBuffer[0], &outBuffer[resultLength], std::back_inserter(result));
-    free(outBuffer);
-    return result;
+    std::vector<uint8_t> bytes = SamplesConverter::convert(&shorts, length);
+    std::vector<uint8_t> decoded = decode(bytes.data(), bytes.size(), frameSize);
+    uint8_t *data = decoded.data();
+    return SamplesConverter::convert(&data, decoded.size());
 }
 
 std::vector<uint8_t> CodecOpus::decode(uint8_t *bytes, int length, int frameSize) {
@@ -166,11 +146,4 @@ int CodecOpus::checkForNull(const char *methodName, bool isEncoder) {
 CodecOpus::~CodecOpus() {
     encoderRelease();
     decoderRelease();
-}
-
-void printArray(uint8_t **array, int length) {
-    for(int i = 0; i < length; i++) {
-        short v = (*array)[i];
-        if (v > INT8_MAX || v < INT8_MIN) LOGD("weffwwef", "v: %d", v);
-    }
 }

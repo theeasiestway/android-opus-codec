@@ -60,11 +60,11 @@ class MainActivity : AppCompatActivity() {
         runLoop = true
         Thread {
             while (runLoop) {
-                val frame = ControllerAudio.getFrame() ?: continue
-                val encoded = codec.encode(frame, frame.size, frame.size / 2) ?: continue
-                Log.d("rgre", "encoded: ${frame.size} ${ if (frame is ByteArray) " bytes" else " shorts"} of audio into ${encoded.size} ${ if (encoded is ByteArray) "bytes " else "shorts "}")
-                val decoded = codec.decode(encoded, encoded.size, frame.size / 2) ?: continue
-                Log.d("rgre", "decoded: ${decoded.size}  ${ if (decoded is ByteArray) "bytes" else "shorts"}")
+                val frame = ControllerAudio.getFrameShort() ?: continue
+                val encoded = codec.encode(frame, frame.size, frame.size) ?: continue
+                Log.d("rgre", "encoded: ${frame.size} ${ if (frame is ShortArray) " bytes" else " shorts"} of audio into ${encoded.size} ${ if (encoded is ShortArray) "bytes " else "shorts "}")
+                val decoded = codec.decode(encoded, encoded.size, frame.size) ?: continue
+                Log.d("rgre", "decoded: ${decoded.size}  ${ if (decoded is ShortArray) "bytes" else "shorts"}")
                 ControllerAudio.write(decoded)
             }
             if (!runLoop) {
