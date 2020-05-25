@@ -140,12 +140,10 @@ std::vector<uint8_t> CodecOpus::decode(uint8_t *bytes, int length, int frameSize
 
     opus_int16 *outBuffer = (opus_int16*) malloc(sizeof(opus_int16) * 1024);
 
-    int resultLength = opus_decode(decoder, bytes, length, outBuffer, frameSize, 0); // FIXME it's necessary to convert bytes* to short*
+    int resultLength = opus_decode(decoder, bytes, length, outBuffer, frameSize, 0);
     if (resultLength <= 0) return result;
 
-  //  result = SamplesConverter::convert(&outBuffer, resultLength);
-
-    std::copy(&outBuffer[0], &outBuffer[resultLength], std::back_inserter(result));
+    result = SamplesConverter::convert(&outBuffer, resultLength);
 
     free(outBuffer);
     return result;

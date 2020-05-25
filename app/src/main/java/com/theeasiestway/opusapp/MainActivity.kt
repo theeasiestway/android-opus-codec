@@ -36,13 +36,13 @@ class MainActivity : AppCompatActivity() {
         ControllerAudio.initRecorder(SAMPLE_RATE.v, FRAME_SIZE * 2)
         ControllerAudio.initTrack(SAMPLE_RATE.v)
 
-
-        codec.encoderInit(SAMPLE_RATE, Constants.Channels.mono(), Constants.Application.audio())
-        codec.decoderInit(SAMPLE_RATE, Constants.Channels.mono())
-
         vPlay.setOnClickListener {
             vPlay.visibility = View.GONE
             vStop.visibility = View.VISIBLE
+
+            codec.encoderInit(SAMPLE_RATE, Constants.Channels.mono(), Constants.Application.audio())
+            codec.decoderInit(SAMPLE_RATE, Constants.Channels.mono())
+
             ControllerAudio.startRecord()
             requestPermissions()
         }
@@ -51,6 +51,7 @@ class MainActivity : AppCompatActivity() {
             vStop.visibility = View.GONE
             vPlay.visibility = View.VISIBLE
             stopLoop()
+            ControllerAudio.stopRecord()
         }
     }
 
@@ -60,10 +61,10 @@ class MainActivity : AppCompatActivity() {
         Thread {
             while (runLoop) {
                 val frame = ControllerAudio.getFrame() ?: continue
-                val encoded = codec.encode(frame, frame.size * 2, frame.size) ?: continue
-                Log.d("rgre", "encoded: ${encoded.size}")
-                val decoded = codec.decode(encoded, encoded.size, frame.size) ?: continue
-                Log.d("rgre", "decoded: ${decoded.size}")
+                val encoded = codec.encode(frame, frame.size, frame.size / 2) ?: continue
+                Log.d("rgre", "encoded: ${frame.size} ${ if (frame is ByteArray) " bytes" else " shorts"} of audio into ${encoded.size} ${ if (encoded is ByteArray) "bytes " else "shorts "}")
+                val decoded = codec.decode(encoded, encoded.size, frame.size / 2) ?: continue
+                Log.d("rgre", "decoded: ${decoded.size}  ${ if (decoded is ByteArray) "bytes" else "shorts"}")
                 ControllerAudio.write(decoded)
             }
             if (!runLoop) {
