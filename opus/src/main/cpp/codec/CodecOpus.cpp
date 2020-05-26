@@ -51,12 +51,12 @@ int CodecOpus::encoderSetComplexity(int complexity) {
 
 std::vector<short> CodecOpus::encode(short *shorts, int length, int frameSize) {
     std::vector<uint8_t> bytes = SamplesConverter::convert(&shorts, length);
-    std::vector<uint8_t> encoded = encode(bytes.data(), bytes.size(), frameSize);
+    std::vector<uint8_t> encoded = encode(bytes.data(), frameSize);
     uint8_t *data = encoded.data();
     return SamplesConverter::convert(&data, encoded.size());
 }
 
-std::vector<uint8_t> CodecOpus::encode(uint8_t *bytes, int length, int frameSize) {
+std::vector<uint8_t> CodecOpus::encode(uint8_t *bytes, int frameSize) {
     std::vector<uint8_t> result;
 
     int ret = checkForNull("encode", true);

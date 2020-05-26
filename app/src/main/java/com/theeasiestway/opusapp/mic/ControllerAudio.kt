@@ -20,14 +20,14 @@ object ControllerAudio {
     // Record
     //
 
-    fun initRecorder(sampleRate: Int, frameSize: Int) {
-        val bufferSize = AudioRecord.getMinBufferSize(sampleRate, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT)
+    fun initRecorder(sampleRate: Int, frameSize: Int, isMono: Boolean) {
+        val bufferSize = AudioRecord.getMinBufferSize(sampleRate, if (isMono) AudioFormat.CHANNEL_IN_MONO else AudioFormat.CHANNEL_IN_STEREO, AudioFormat.ENCODING_PCM_16BIT)
         for (i in 0..5) {
             try {
                 recorder = AudioRecord(
                     MediaRecorder.AudioSource.MIC,
                     sampleRate,
-                    AudioFormat.CHANNEL_IN_MONO,
+                    if (isMono) AudioFormat.CHANNEL_IN_MONO else AudioFormat.CHANNEL_IN_STEREO,
                     AudioFormat.ENCODING_PCM_16BIT,
                     bufferSize
                 )
@@ -62,15 +62,27 @@ object ControllerAudio {
 
     fun getFrame(): ByteArray? {
         val frame = ByteArray(frameSize)
-        val count = recorder.read(frame, 0, frameSize)
-        if (count > 0) return frame
+        var offset = 0
+        var remained = frame.size
+        while (remained > 0) {
+            val read = recorder.read(frame, offset, remained)
+            offset += read
+            remained -= read
+        }
+        if (remained <= 0) return frame
         return null
     }
 
     fun getFrameShort(): ShortArray? {
         val frame = ShortArray(frameSize)
-        val count = recorder.read(frame, 0, frameSize)
-        if (count > 0) return frame
+        var offset = 0
+        var remained = frame.size
+        while (remained > 0) {
+            val read = recorder.read(frame, offset, remained)
+            offset += read
+            remained -= read
+        }
+        if (remained <= 0) return frame
         return null
     }
 
@@ -90,14 +102,14 @@ object ControllerAudio {
     // Play
     //
 
-    fun initTrack(sampleRate: Int) {
-        val bufferSize = AudioRecord.getMinBufferSize(sampleRate, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT)
+    fun initTrack(sampleRate: Int, isMono: Boolean) {
+        val bufferSize = AudioRecord.getMinBufferSize(sampleRate, if (isMono) AudioFormat.CHANNEL_IN_MONO else AudioFormat.CHANNEL_IN_STEREO, AudioFormat.ENCODING_PCM_16BIT)
         for (i in 0..5) {
             try {
                 track = AudioTrack(
                     AudioManager.STREAM_MUSIC,
                     sampleRate,
-                    AudioFormat.CHANNEL_OUT_MONO,
+                    if (isMono) AudioFormat.CHANNEL_OUT_MONO else AudioFormat.CHANNEL_OUT_STEREO,
                     AudioFormat.ENCODING_PCM_16BIT,
                     bufferSize,
                     AudioTrack.MODE_STREAM
