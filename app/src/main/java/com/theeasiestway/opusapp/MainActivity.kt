@@ -2,12 +2,12 @@ package com.theeasiestway.opusapp
 
 import android.content.pm.PackageManager
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.theeasiestway.opus.Constants
 import com.theeasiestway.opus.Opus
 import com.theeasiestway.opusapp.mic.ControllerAudio
@@ -29,7 +29,7 @@ class MainActivity : AppCompatActivity() {
     private val APPLICATION = Constants.Application.audio()
 
     private var runLoop = false
-    private var runWithShorts = true
+    private var runWithShorts = false
     private var needToConvert = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -65,7 +65,7 @@ class MainActivity : AppCompatActivity() {
     private fun startLoop() {
         stopLoop()
         runLoop = true
-        ControllerAudio.initRecorder(SAMPLE_RATE.v, FRAME_SIZE * 2, CHANNELS.v == 1)
+        ControllerAudio.initRecorder(SAMPLE_RATE.v, FRAME_SIZE * 2 * CHANNELS.v, CHANNELS.v == 1) // "FRAME_SIZE * 2 * CHANNELS.v" it's formula from opus.h "frame_size*channels*sizeof(opus_int16)"
         ControllerAudio.initTrack(SAMPLE_RATE.v, CHANNELS.v == 1)
         ControllerAudio.startRecord()
         Thread {

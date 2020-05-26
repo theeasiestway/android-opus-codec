@@ -16,6 +16,8 @@ private:
     OpusEncoder* encoder;
     OpusDecoder* decoder;
 
+    int decoderNumChannels = -1;
+
     int checkForNull(const char *methodName, bool isEncoder);
 
 public:

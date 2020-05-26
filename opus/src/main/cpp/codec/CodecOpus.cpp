@@ -26,7 +26,7 @@ int CodecOpus::encoderInit(int sampleRate, int numChannels, int application) {
     int ret = opus_encoder_init(encoder, sampleRate, numChannels, application);
 
     if (ret) {
-        LOGE(TAG, "[encoderInit] couldn't init encoder ret: %d", ret);
+        LOGE(TAG, "[encoderInit] couldn't init encoder ret: %d; error: %s", ret, opus_strerror(ret));
         free(encoder);
         return -1;
     } else LOGD(TAG, "[encoderInit] encoder successfully initialized");
@@ -74,7 +74,7 @@ std::vector<uint8_t> CodecOpus::encode(uint8_t *bytes, int frameSize) {
 }
 
 void CodecOpus::encoderRelease() {
-    free(encoder);
+    if (encoder) opus_encoder_destroy(encoder);
 }
 
 //
@@ -97,10 +97,12 @@ int CodecOpus::decoderInit(int sampleRate, int numChannels) {
     int ret = opus_decoder_init(decoder, sampleRate, numChannels);
 
     if (ret) {
-        LOGE(TAG, "[decoderInit] couldn't init decoder ret: %d", ret);
+        LOGE(TAG, "[decoderInit] couldn't init decoder ret: %d; error: %s", ret, opus_strerror(ret));
         free(decoder);
         return -1;
     } else LOGD(TAG, "[decoderInit] decoder successfully initialized");
+
+    decoderNumChannels = numChannels;
 
     return 0;
 }
@@ -123,14 +125,15 @@ std::vector<uint8_t> CodecOpus::decode(uint8_t *bytes, int length, int frameSize
     int resultLength = opus_decode(decoder, bytes, length, outBuffer, frameSize, 0);
     if (resultLength <= 0) return result;
 
-    result = SamplesConverter::convert(&outBuffer, resultLength);
+    result = SamplesConverter::convert(&outBuffer, resultLength * decoderNumChannels);
 
     free(outBuffer);
     return result;
 }
 
 void CodecOpus::decoderRelease() {
-    free(decoder);
+    decoderNumChannels = -1;
+    if (decoder) opus_decoder_destroy(decoder);
 }
 
 int CodecOpus::checkForNull(const char *methodName, bool isEncoder) {

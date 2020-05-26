@@ -114,6 +114,9 @@ object ControllerAudio {
                     bufferSize,
                     AudioTrack.MODE_STREAM
                 )
+
+               // track.setStereoVolume(0f, 1f) //TODO it's useful for stereo audio
+
                 if (track.state == AudioRecord.STATE_INITIALIZED) {
                     track.play()
                     trackReady = true
