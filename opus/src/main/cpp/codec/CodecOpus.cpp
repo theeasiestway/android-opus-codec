@@ -66,7 +66,10 @@ std::vector<uint8_t> CodecOpus::encode(uint8_t *bytes, int frameSize) {
     unsigned char *outBuffer = (unsigned char*) malloc((size_t) maxBytesCount);
 
     int resultLength = opus_encode(encoder, (opus_int16 *) bytes, frameSize, outBuffer, maxBytesCount);
-    if (resultLength <= 0) return result;
+    if (resultLength <= 0) {
+        LOGE(TAG, "[encode] error: %s", opus_strerror(resultLength));
+        return result;
+    }
 
     std::copy(&outBuffer[0], &outBuffer[resultLength], std::back_inserter(result));
     free(outBuffer);
@@ -75,6 +78,7 @@ std::vector<uint8_t> CodecOpus::encode(uint8_t *bytes, int frameSize) {
 
 void CodecOpus::encoderRelease() {
     if (encoder) opus_encoder_destroy(encoder);
+    encoder = nullptr;
 }
 
 //
@@ -123,7 +127,10 @@ std::vector<uint8_t> CodecOpus::decode(uint8_t *bytes, int length, int frameSize
     opus_int16 *outBuffer = (opus_int16*) malloc(sizeof(opus_int16) * 1024);
 
     int resultLength = opus_decode(decoder, bytes, length, outBuffer, frameSize, 0);
-    if (resultLength <= 0) return result;
+    if (resultLength <= 0) {
+        LOGE(TAG, "[decode] error: %s", opus_strerror(resultLength));
+        return result;
+    }
 
     result = SamplesConverter::convert(&outBuffer, resultLength * decoderNumChannels);
 
@@ -134,6 +141,7 @@ std::vector<uint8_t> CodecOpus::decode(uint8_t *bytes, int length, int frameSize
 void CodecOpus::decoderRelease() {
     decoderNumChannels = -1;
     if (decoder) opus_decoder_destroy(decoder);
+    decoder = nullptr;
 }
 
 int CodecOpus::checkForNull(const char *methodName, bool isEncoder) {

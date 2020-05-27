@@ -12,6 +12,10 @@ import com.theeasiestway.opus.Constants
 import com.theeasiestway.opus.Opus
 import com.theeasiestway.opusapp.mic.ControllerAudio
 
+//
+// Created by Loboda Alexey on 21.05.2020.
+//
+
 class MainActivity : AppCompatActivity() {
 
     private val TAG = "OpusActivity"
@@ -23,14 +27,17 @@ class MainActivity : AppCompatActivity() {
     private lateinit var vStop: Button
 
     private val codec = Opus()
-    private val SAMPLE_RATE = Constants.SampleRate.sr_8000()
-    private val CHANNELS = Constants.Channels.mono()
-    private val FRAME_SIZE = 160
-    private val APPLICATION = Constants.Application.audio()
+    private val SAMPLE_RATE = Constants.SampleRate._8000()
+    private val CHANNELS = Constants.Channels.stereo()
+    /** "CHUNK_SIZE = FRAME_SIZE.v * CHANNELS.v * 2" it's formula from opus.h "frame_size*channels*sizeof(opus_int16)" */
+    private val CHUNK_SIZE = Constants.FrameSize._160().v * CHANNELS.v * 2
+    private val FRAME_SIZE_SHORT = Constants.FrameSize._320() // samples per channel
+    private val FRAME_SIZE_BYTE = Constants.FrameSize._160()  // samples per channel
+    private val APPLICATION = Constants.Application.voip()
 
     private var runLoop = false
-    private var runWithShorts = false
-    private var needToConvert = false
+    private var runWithShorts = true
+    private var needToConvert = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,7 +72,7 @@ class MainActivity : AppCompatActivity() {
     private fun startLoop() {
         stopLoop()
         runLoop = true
-        ControllerAudio.initRecorder(SAMPLE_RATE.v, FRAME_SIZE * 2 * CHANNELS.v, CHANNELS.v == 1) // "FRAME_SIZE * 2 * CHANNELS.v" it's formula from opus.h "frame_size*channels*sizeof(opus_int16)"
+        ControllerAudio.initRecorder(SAMPLE_RATE.v, CHUNK_SIZE, CHANNELS.v == 1)
         ControllerAudio.initTrack(SAMPLE_RATE.v, CHANNELS.v == 1)
         ControllerAudio.startRecord()
         Thread {
@@ -83,9 +90,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun processShorts() {
         val frame = ControllerAudio.getFrameShort() ?: return
-        val encoded = codec.encode(frame, FRAME_SIZE * 2) ?: return
+        val encoded = codec.encode(frame, FRAME_SIZE_SHORT) ?: return
         Log.d(TAG, "encoded: ${frame.size} shorts of audio into ${encoded.size} shorts")
-        val decoded = codec.decode(encoded, FRAME_SIZE * 2) ?: return
+        val decoded = codec.decode(encoded, FRAME_SIZE_SHORT) ?: return
         Log.d(TAG, "decoded: ${decoded.size} shorts")
 
         if (needToConvert) {
@@ -98,9 +105,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun processBytes() {
         val frame = ControllerAudio.getFrame() ?: return
-        val encoded = codec.encode(frame, FRAME_SIZE) ?: return
+        val encoded = codec.encode(frame, FRAME_SIZE_BYTE) ?: return
         Log.d(TAG, "encoded: ${frame.size} bytes of audio into ${encoded.size} bytes")
-        val decoded = codec.decode(encoded, FRAME_SIZE) ?: return
+        val decoded = codec.decode(encoded, FRAME_SIZE_BYTE) ?: return
         Log.d(TAG, "decoded: ${decoded.size} bytes")
 
         if (needToConvert) {

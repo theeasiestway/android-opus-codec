@@ -5,6 +5,10 @@ import android.media.audiofx.AutomaticGainControl
 import android.media.audiofx.NoiseSuppressor
 import android.util.Log
 
+//
+// Created by Loboda Alexey on 21.05.2020.
+//
+
 object ControllerAudio {
 
     private const val TAG = "ControllerAudio"
@@ -115,7 +119,7 @@ object ControllerAudio {
                     AudioTrack.MODE_STREAM
                 )
 
-               // track.setStereoVolume(0f, 1f) //TODO it's useful for stereo audio
+               // track.setStereoVolume(0f, 1f) // it may be useful for stereo audio
 
                 if (track.state == AudioRecord.STATE_INITIALIZED) {
                     track.play()
