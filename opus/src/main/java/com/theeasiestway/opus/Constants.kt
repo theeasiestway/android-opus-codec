@@ -9,6 +9,10 @@ import androidx.annotation.IntRange
 object Constants {
 
     class SampleRate private constructor(val v: Int) {
+
+        /** Sampling rate of input signal (Hz)
+         * This must be one of 8000, 12000, 16000, 24000, or 48000. */
+
         companion object {
             fun _8000() = SampleRate(8000)
             fun _12000() = SampleRate(12000)
@@ -61,8 +65,7 @@ object Constants {
          * special values #auto and #max.
          * The value #max can be used to cause the codec to use as much
          * rate as it can, which is useful for controlling the rate by adjusting the
-         * output buffer size.
-         **/
+         * output buffer size. */
 
         companion object {
             fun instance(@IntRange(from = 500, to = 512000) value: Int): Bitrate {
@@ -83,8 +86,7 @@ object Constants {
 
     class FrameSize private constructor(val v: Int) {
 
-        /**
-         * Number of samples per channel in the input signal.
+        /** Number of samples per channel in the input signal.
          * This must be an Opus frame size for
          * the encoder's sampling rate.
          * For example, at 48 kHz the permitted
@@ -108,6 +110,23 @@ object Constants {
             fun _2560() = FrameSize(2560)
             fun _2880() = FrameSize(2880)
             fun _custom(value: Int) = FrameSize(value)
+
+            fun fromValue(value: Int): FrameSize {
+                return when(value) {
+                    120 -> _120()
+                    160 -> _160()
+                    240 -> _240()
+                    320 -> _320()
+                    480 -> _480()
+                    640 -> _640()
+                    960 -> _960()
+                    1280 -> _1280()
+                    1920 -> _1920()
+                    2560 -> _2560()
+                    2880 -> _2880()
+                    else -> _custom(value)
+                }
+            }
         }
     }
 }

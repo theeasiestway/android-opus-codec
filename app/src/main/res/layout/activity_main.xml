@@ -1,14 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="32dp"
+        android:paddingEnd="32dp"
+        android:layout_marginBottom="16dp">
+
+    <SeekBar
+        android:id="@+id/vSampleRateSeek"
+        style="@style/Widget.AppCompat.SeekBar.Discrete"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:progress="1"
+        android:max="4"
+        android:layout_marginBottom="8dp"/>
+
+        <TextView
+            android:id="@+id/vSampleRate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"/>
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_gravity="center">
+        android:layout_marginBottom="16dp">
 
         <Button
             android:id="@+id/vPlay"
@@ -23,4 +49,56 @@
             android:text="Stop"
             android:visibility="gone"/>
     </LinearLayout>
-</FrameLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <RadioGroup
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/vHandleBytes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Bytes"
+                android:checked="true"/>
+
+            <RadioButton
+                android:id="@+id/vHandleShorts"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Shorts"/>
+        </RadioGroup>
+
+        <RadioGroup
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/vMono"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Mono"
+                android:checked="true"/>
+
+            <RadioButton
+                android:id="@+id/vStereo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Stereo"/>
+        </RadioGroup>
+
+        <CheckBox
+            android:id="@+id/vConvert"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Convert result"
+            android:checked="false"/>
+    </LinearLayout>
+</LinearLayout>
