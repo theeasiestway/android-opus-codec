@@ -11,7 +11,7 @@ class Opus {
 
     companion object {
 
-        val TAG = "Opus"
+        val TAG = "CodecOpus"
 
         init {
             try { System.loadLibrary("easyopus") }
