@@ -202,7 +202,7 @@ class MainActivity : AppCompatActivity() {
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         if (permissions[0] == audioPermission &&
             permissions[1] == readPermission &&
-            permissions[3] == writePermission &&
+            permissions[2] == writePermission &&
             requestCode == 123) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED &&
                 grantResults[1] == PackageManager.PERMISSION_GRANTED &&
