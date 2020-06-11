@@ -97,6 +97,7 @@ object ControllerAudio {
     fun stopRecord() {
         try {
             if (recorder.state == AudioTrack.STATE_INITIALIZED) recorder.stop()
+            recorder.release()
             noiseSuppressor?.release()
             automaticGainControl?.release()
         } catch (e: Exception) { Log.e(TAG, "[stopRecord] error: $e") }
