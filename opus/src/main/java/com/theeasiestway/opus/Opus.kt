@@ -58,15 +58,16 @@ class Opus {
     }
     private external fun decoderInit(sampleRate: Int, numChannels: Int): Int
 
-    fun decode(bytes: ByteArray, frameSize: Constants.FrameSize): ByteArray? {
-        return decode(bytes, frameSize.v)
+    fun decode(bytes: ByteArray, frameSize: Constants.FrameSize, fec: Int = 0): ByteArray? {
+        return decode(bytes, frameSize.v, fec)
     }
-    private external fun decode(bytes: ByteArray, frameSize: Int): ByteArray?
+    private external fun decode(bytes: ByteArray, frameSize: Int, fec: Int): ByteArray?
 
-    fun decode(shorts: ShortArray, frameSize: Constants.FrameSize): ShortArray? {
-        return decode(shorts, frameSize.v)
+    fun decode(shorts: ShortArray, frameSize: Constants.FrameSize, fec: Int = 0): ShortArray? {
+        return decode(shorts, frameSize.v, fec)
     }
-    private external fun decode(shorts: ShortArray, frameSize: Int): ShortArray?
+
+    private external fun decode(shorts: ShortArray, frameSize: Int, fec: Int): ShortArray?
     external fun decoderRelease()
 
     //
