@@ -80,11 +80,11 @@ Java_com_theeasiestway_opus_Opus_decoderInit(JNIEnv *env, jobject thiz, jint sam
 
 extern "C"
 JNIEXPORT jbyteArray JNICALL
-Java_com_theeasiestway_opus_Opus_decode___3BI(JNIEnv *env, jobject thiz, jbyteArray bytes, jint frame_size) {
+Java_com_theeasiestway_opus_Opus_decode___3BII(JNIEnv *env, jobject thiz, jbyteArray bytes, jint frame_size, jint fec) {
     jbyte *nativeBytes = env->GetByteArrayElements(bytes, 0);
     jint length = env->GetArrayLength(bytes);
 
-    std::vector<uint8_t> encodedData = codec.decode((uint8_t *) nativeBytes, length, frame_size);
+    std::vector<uint8_t> encodedData = codec.decode((uint8_t *) nativeBytes, length, frame_size, fec);
     int encodedSize = encodedData.size();
     if (encodedSize <= 0) return nullptr;
 
@@ -97,11 +97,11 @@ Java_com_theeasiestway_opus_Opus_decode___3BI(JNIEnv *env, jobject thiz, jbyteAr
 
 extern "C"
 JNIEXPORT jshortArray JNICALL
-Java_com_theeasiestway_opus_Opus_decode___3SI(JNIEnv *env, jobject thiz, jshortArray shorts, jint frame_size) {
+Java_com_theeasiestway_opus_Opus_decode___3SII(JNIEnv *env, jobject thiz, jshortArray shorts, jint frame_size, jint fec) {
     jshort *nativeShorts = env->GetShortArrayElements(shorts, 0);
     jint length = env->GetArrayLength(shorts);
 
-    std::vector<short> encodedData = codec.decode(nativeShorts, length, frame_size);
+    std::vector<short> encodedData = codec.decode(nativeShorts, length, frame_size, fec);
     int encodedSize = encodedData.size();
     if (encodedSize <= 0) return nullptr;
 

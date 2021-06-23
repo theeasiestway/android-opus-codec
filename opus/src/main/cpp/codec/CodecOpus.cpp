@@ -111,14 +111,14 @@ int CodecOpus::decoderInit(int sampleRate, int numChannels) {
     return 0;
 }
 
-std::vector<short> CodecOpus::decode(short *shorts, int length, int frameSize) {
+std::vector<short> CodecOpus::decode(short *shorts, int length, int frameSize, int fec) {
     std::vector<uint8_t> bytes = SamplesConverter::convert(&shorts, length);
-    std::vector<uint8_t> decoded = decode(bytes.data(), bytes.size(), frameSize);
+    std::vector<uint8_t> decoded = decode(bytes.data(), bytes.size(), frameSize, fec);
     uint8_t *data = decoded.data();
     return SamplesConverter::convert(&data, decoded.size());
 }
 
-std::vector<uint8_t> CodecOpus::decode(uint8_t *bytes, int length, int frameSize) {
+std::vector<uint8_t> CodecOpus::decode(uint8_t *bytes, int length, int frameSize, int fec) {
     std::vector<uint8_t> result;
 
     int ret = checkForNull("decode", false);
@@ -126,7 +126,7 @@ std::vector<uint8_t> CodecOpus::decode(uint8_t *bytes, int length, int frameSize
 
     opus_int16 *outBuffer = (opus_int16*) malloc(sizeof(opus_int16) * 1024);
 
-    int resultLength = opus_decode(decoder, bytes, length, outBuffer, frameSize, 0);
+    int resultLength = opus_decode(decoder, bytes, length, outBuffer, frameSize, fec);
     if (resultLength <= 0) {
         LOGE(TAG, "[decode] error: %s", opus_strerror(resultLength));
         return result;

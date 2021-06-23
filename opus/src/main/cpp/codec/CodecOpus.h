@@ -29,8 +29,8 @@ public:
     void encoderRelease();
 
     int decoderInit(int sampleRate, int numChannels);
-    std::vector<uint8_t> decode(uint8_t *bytes, int length, int frameSize);
-    std::vector<short> decode(short *shorts, int length, int frameSize);
+    std::vector<uint8_t> decode(uint8_t *bytes, int length, int frameSize, int fec);
+    std::vector<short> decode(short *shorts, int length, int frameSize, int fec);
     void decoderRelease();
 
     ~CodecOpus();
