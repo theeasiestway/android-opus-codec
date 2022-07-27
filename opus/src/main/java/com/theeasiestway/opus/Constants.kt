@@ -29,6 +29,12 @@ object Constants {
         }
     }
 
+    class VBR private constructor(val v: Int) {
+        companion object {
+            fun off() = VBR(0)
+        }
+    }
+
     class Application private constructor(val v: Int) {
 
         /** voip - Best for most VoIP/videoconference applications where listening quality and intelligibility matter most.

@@ -49,6 +49,13 @@ int CodecOpus::encoderSetComplexity(int complexity) {
     return opus_encoder_ctl(encoder, OPUS_SET_COMPLEXITY(complexity));
 }
 
+int CodecOpus::encoderSetVBR(int vbr) {
+    int ret = checkForNull("encoderSetVBR", true);
+    if (ret < 0) return ret;
+
+    return opus_encoder_ctl(encoder, OPUS_SET_VBR(vbr));
+}
+
 std::vector<short> CodecOpus::encode(short *shorts, int length, int frameSize) {
     std::vector<uint8_t> bytes = SamplesConverter::convert(&shorts, length);
     std::vector<uint8_t> encoded = encode(bytes.data(), frameSize);

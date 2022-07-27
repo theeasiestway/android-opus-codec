@@ -31,6 +31,12 @@ Java_com_theeasiestway_opus_Opus_encoderSetComplexity(JNIEnv *env, jobject thiz,
 }
 
 extern "C"
+JNIEXPORT jint JNICALL
+Java_com_theeasiestway_opus_Opus_encoderSetVBR(JNIEnv *env, jobject thiz, jint vbr) {
+    return codec.encoderSetVBR(vbr);
+}
+
+extern "C"
 JNIEXPORT jbyteArray JNICALL
 Java_com_theeasiestway_opus_Opus_encode___3BI(JNIEnv *env, jobject thiz, jbyteArray bytes, jint frame_size) {
     jbyte *nativeBytes = env->GetByteArrayElements(bytes, 0);

@@ -24,6 +24,7 @@ public:
     int encoderInit(int sampleRate, int numChannels, int application);
     int encoderSetBitrate(int bitrate);
     int encoderSetComplexity(int complexity);
+    int encoderSetVBR(int vbr);
     std::vector<uint8_t> encode(uint8_t *bytes, int frameSize);
     std::vector<short> encode(short *shorts, int length, int frameSize);
     void encoderRelease();

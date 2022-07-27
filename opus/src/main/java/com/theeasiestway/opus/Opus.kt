@@ -38,6 +38,11 @@ class Opus {
     }
     private external fun encoderSetComplexity(complexity: Int): Int
 
+    fun encoderSetVBR(vbr: Constants.VBR): Int {
+        return encoderSetVBR(vbr.v)
+    }
+    private external fun encoderSetVBR(complexity: Int): Int
+
     fun encode(bytes: ByteArray, frameSize: Constants.FrameSize): ByteArray? {
         return encode(bytes, frameSize.v)
     }
