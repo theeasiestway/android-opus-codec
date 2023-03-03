@@ -8,12 +8,14 @@
 #include <cstdint>
 #include <vector>
 #include <opus.h>
+#include <opusenc.h>
 
 class CodecOpus {
 
 private:
     const char *TAG = "CodecOpus";
     OpusEncoder* encoder;
+    OggOpusEnc* fileEncoder;
     OpusDecoder* decoder;
 
     int decoderNumChannels = -1;
@@ -21,11 +23,12 @@ private:
     int checkForNull(const char *methodName, bool isEncoder);
 
 public:
-    int encoderInit(int sampleRate, int numChannels, int application);
+    int encoderCreateFile(int sampleRate, int numChannels, int application);
+    int encoderInit(int sampleRate, int numChannels, int application, bool toFile);
     int encoderSetBitrate(int bitrate);
     int encoderSetComplexity(int complexity);
-    std::vector<uint8_t> encode(uint8_t *bytes, int frameSize);
-    std::vector<short> encode(short *shorts, int length, int frameSize);
+    std::vector<uint8_t> encode(uint8_t *bytes, int frameSize, bool toFile);
+    std::vector<short> encode(short *shorts, int length, int frameSize, bool toFile);
     void encoderRelease();
 
     int decoderInit(int sampleRate, int numChannels);

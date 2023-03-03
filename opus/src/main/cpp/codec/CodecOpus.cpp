@@ -10,7 +10,7 @@
 // Encoder
 //
 
-int CodecOpus::encoderInit(int sampleRate, int numChannels, int application) {
+int CodecOpus::encoderInit(int sampleRate, int numChannels, int application, bool toFile = false) {
 
     if (numChannels != 1 && numChannels != 2) LOGE(TAG, "[encoderInit] numChannels is incorrect: %d - it must be either 1 or 2, otherwise the encoder may works incorrectly", numChannels);
 
@@ -21,12 +21,20 @@ int CodecOpus::encoderInit(int sampleRate, int numChannels, int application) {
         return size;
     }
 
-    encoder = (OpusEncoder*) malloc((size_t) size);
+    int error;
 
-    int ret = opus_encoder_init(encoder, sampleRate, numChannels, application);
+    if (toFile) {
+        OggOpusComments *comments;
+        comments = ope_comments_create();
+        fileEncoder = (OggOpusEnc*) malloc((size_t) size);
+        fileEncoder = ope_encoder_create_file("rec.opus", comments, sampleRate, numChannels, 0, &error);
+    } else {
+        encoder = (OpusEncoder*) malloc((size_t) size);
+        error = opus_encoder_init(encoder, sampleRate, numChannels, application);
+    }
 
-    if (ret) {
-        LOGE(TAG, "[encoderInit] couldn't init encoder ret: %d; error: %s", ret, opus_strerror(ret));
+    if (error) {
+        LOGE(TAG, "[encoderInit] couldn't init encoder ret: %d; error: %s", error, opus_strerror(error));
         free(encoder);
         return -1;
     } else LOGD(TAG, "[encoderInit] encoder successfully initialized");
@@ -49,14 +57,14 @@ int CodecOpus::encoderSetComplexity(int complexity) {
     return opus_encoder_ctl(encoder, OPUS_SET_COMPLEXITY(complexity));
 }
 
-std::vector<short> CodecOpus::encode(short *shorts, int length, int frameSize) {
+std::vector<short> CodecOpus::encode(short *shorts, int length, int frameSize, bool toFile = false) {
     std::vector<uint8_t> bytes = SamplesConverter::convert(&shorts, length);
-    std::vector<uint8_t> encoded = encode(bytes.data(), frameSize);
+    std::vector<uint8_t> encoded = encode(bytes.data(), frameSize, toFile);
     uint8_t *data = encoded.data();
     return SamplesConverter::convert(&data, encoded.size());
 }
 
-std::vector<uint8_t> CodecOpus::encode(uint8_t *bytes, int frameSize) {
+std::vector<uint8_t> CodecOpus::encode(uint8_t *bytes, int frameSize, bool toFile = false) {
     std::vector<uint8_t> result;
 
     int ret = checkForNull("encode", true);
@@ -65,7 +73,12 @@ std::vector<uint8_t> CodecOpus::encode(uint8_t *bytes, int frameSize) {
     int maxBytesCount = sizeof(unsigned char) * 1024;
     unsigned char *outBuffer = (unsigned char*) malloc((size_t) maxBytesCount);
 
-    int resultLength = opus_encode(encoder, (opus_int16 *) bytes, frameSize, outBuffer, maxBytesCount);
+    int resultLength;
+    if (toFile) {
+        resultLength = ope_encoder_write(fileEncoder, (opus_int16 *) bytes, frameSize);
+    } else {
+        resultLength = opus_encode(encoder, (opus_int16 *) bytes, frameSize, outBuffer, maxBytesCount);
+    }
     if (resultLength <= 0) {
         LOGE(TAG, "[encode] error: %s", opus_strerror(resultLength));
         return result;

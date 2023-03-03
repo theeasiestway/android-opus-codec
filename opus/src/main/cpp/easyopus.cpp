@@ -14,8 +14,8 @@ CodecOpus codec;
 //
 
 extern "C"
-JNIEXPORT jint JNICALL Java_com_theeasiestway_opus_Opus_encoderInit(JNIEnv *env, jobject thiz, jint sample_rate, jint num_channels, jint application) {
-    return codec.encoderInit(sample_rate, num_channels, application);
+JNIEXPORT jint JNICALL Java_com_theeasiestway_opus_Opus_encoderInit(JNIEnv *env, jobject thiz, jint sample_rate, jint num_channels, jint application, jboolean toFile) {
+    return codec.encoderInit(sample_rate, num_channels, application, toFile);
 }
 
 extern "C"
@@ -32,9 +32,9 @@ Java_com_theeasiestway_opus_Opus_encoderSetComplexity(JNIEnv *env, jobject thiz,
 
 extern "C"
 JNIEXPORT jbyteArray JNICALL
-Java_com_theeasiestway_opus_Opus_encode___3BI(JNIEnv *env, jobject thiz, jbyteArray bytes, jint frame_size) {
+Java_com_theeasiestway_opus_Opus_encode___3BI(JNIEnv *env, jobject thiz, jbyteArray bytes, jint frame_size, jboolean toFile) {
     jbyte *nativeBytes = env->GetByteArrayElements(bytes, 0);
-    std::vector<uint8_t> encodedData = codec.encode((uint8_t *) nativeBytes, frame_size);
+    std::vector<uint8_t> encodedData = codec.encode((uint8_t *) nativeBytes, frame_size, toFile);
     int encodedSize = encodedData.size();
     if (encodedSize <= 0) return nullptr;
 
@@ -47,11 +47,11 @@ Java_com_theeasiestway_opus_Opus_encode___3BI(JNIEnv *env, jobject thiz, jbyteAr
 
 extern "C"
 JNIEXPORT jshortArray JNICALL
-Java_com_theeasiestway_opus_Opus_encode___3SI(JNIEnv *env, jobject thiz, jshortArray shorts, jint frame_size) {
+Java_com_theeasiestway_opus_Opus_encode___3SI(JNIEnv *env, jobject thiz, jshortArray shorts, jint frame_size, jboolean toFile) {
     jshort *nativeShorts = env->GetShortArrayElements(shorts, 0);
     jint length = env->GetArrayLength(shorts);
 
-    std::vector<short> encodedData = codec.encode(nativeShorts, length, frame_size);
+    std::vector<short> encodedData = codec.encode(nativeShorts, length, frame_size, toFile);
     int encodedSize = encodedData.size();
     if (encodedSize <= 0) return nullptr;
 
