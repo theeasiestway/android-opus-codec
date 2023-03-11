@@ -33,7 +33,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var vConvert: CheckBox
 
     private val codec = Opus()
-    private val TOFILE = true
     private val APPLICATION = Constants.Application.audio()
     private var CHUNK_SIZE = 0
     private lateinit var SAMPLE_RATE: Constants.SampleRate
@@ -141,7 +140,7 @@ class MainActivity : AppCompatActivity() {
         val handleShorts = vShorts.isChecked
         recalculateCodecValues()
 
-        codec.encoderInit(SAMPLE_RATE, CHANNELS, APPLICATION, TOFILE)
+        codec.encoderInit(SAMPLE_RATE, CHANNELS, APPLICATION)
         codec.decoderInit(SAMPLE_RATE, CHANNELS)
 
         ControllerAudio.initRecorder(SAMPLE_RATE.v, CHUNK_SIZE, CHANNELS.v == 1)
