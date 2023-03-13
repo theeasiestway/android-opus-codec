@@ -26,7 +26,12 @@ int CodecOpus::encoderInit(int sampleRate, int numChannels, int application) {
     OggOpusComments *comments;
     comments = ope_comments_create();
     fileEncoder = (OggOpusEnc*) malloc((size_t) size);
-    fileEncoder = ope_encoder_create_file("rec.opus", comments, sampleRate, numChannels, 0, &error);
+    fileEncoder = ope_encoder_create_file("/data/data/com.theeasiestway.opus/cache/rec.opus", comments, sampleRate, numChannels, 0, &error);
+    if (!fileEncoder) {
+        LOGE(TAG, "[encoderInit] couldn't open file");
+        free(fileEncoder);
+        return -1;
+    }
 
     encoder = (OpusEncoder*) malloc((size_t) size);
     error = opus_encoder_init(encoder, sampleRate, numChannels, application);
