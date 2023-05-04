@@ -1,5 +1,5 @@
 # android-opus-codec
-An android wrapper around [libopus 1.3.1](https://opus-codec.org/release/stable/2019/04/12/libopus-1_3_1.html) written on C++ and Kotlin.
+Android wrapper around [libopus 1.3.1](https://opus-codec.org/release/stable/2019/04/12/libopus-1_3_1.html) written on C++ and Kotlin.
 
 ## Supported features:
 1. Encoding PCM audio into Opus.
@@ -25,7 +25,7 @@ val CHANNELS = Constants.Channels.stereo()            // type of the input audio
 val APPLICATION = Constants.Application.audio()       // coding mode of the encoder
 var FRAME_SIZE = Constants.FrameSize._120()           // default frame size for 48000Hz
 
-val codec = Opus()                                    // getting an instance of Codec
+val codec = Opus()                                    // getting Codec instance
 codec.encoderInit(SAMPLE_RATE, CHANNELS, APPLICATION) // init encoder
 codec.decoderInit(SAMPLE_RATE, CHANNELS)              // init decoder
 ```
@@ -35,14 +35,14 @@ codec.decoderInit(SAMPLE_RATE, CHANNELS)              // init decoder
 /* this step is optional because the encoder can use default values */
 val COMPLEXITY = Constants.Complexity.instance(10)    // encoder's algorithmic complexity 
 val BITRATE = Constants.Bitrate.max()                 // encoder's bitrate
-codec.encoderSetComplexity(COMPLEXITY)                // set the complexity
-codec.encoderSetBitrate(BITRATE)                      // set the bitrate
+codec.encoderSetComplexity(COMPLEXITY)                // complexity setup
+codec.encoderSetBitrate(BITRATE)                      // bitrate setup
 ```
 
 #### Encoding:
 ```kotlin
-val frame = ...                                       // gets a chunk of audio from some source as an array of bytes or shorts
-val encoded = codec.encode(frame, FRAME_SIZE)         // encode a chunk of audio into Opus
+val frame = ...                                       // get a chunk of audio from some source as an array of bytes or shorts
+val encoded = codec.encode(frame, FRAME_SIZE)         // encode the audio chunk into Opus
 if (encoded != null) Log.d("Opus", "encoded chunk size: ${encoded.size}")
 ```
 
@@ -52,22 +52,22 @@ val decoded = codec.decode(encoded, FRAME_SIZE)       // decode a chunk of audio
 if (decoded != null) Log.d("Opus", "decoded chunk size: ${decoded.size}")
 ```
 
-#### Freeing resources when closing the app:
+#### Releasing resources when the app closes:
 ```kotlin
 codec.encoderRelease()
 codec.decoderRelease()
 ```
 
 ## Project structure
-#### The project consists of two modules:
+#### Project consists of two modules:
 - **app** - here you can find a sample app that demonsrates ecoding, decoding and converting procedures by capturing an audio from device's mic and play it from a loud speaker. I recommend to check this app using a headphones, otherwise there may be echo in a hight levels of volume.
-- **opus** - here you can find a C++ class that interacts with [libopus 1.3.1](https://opus-codec.org/release/stable/2019/04/12/libopus-1_3_1.html) and a JNI wrapper for interacting with it from Java/Kotlin layer.
+- **opus** - here you can find a C++ class that interacts with [libopus 1.3.1](https://opus-codec.org/release/stable/2019/04/12/libopus-1_3_1.html) and JNI wrapper for interacting with it from Java/Kotlin layer.
 
 #### Compiled library:
-- **opus.aar** - it's a compiled library of **opus** module that mentioned above, it placed in a root directory of the project, you can easily add it to your project using gradle dependencies. First you should place **opus.aar** in the libs folder of your project and then add to your build.gradle:
+- **opus.aar** - it's a compiled library of **opus** module that mentioned above, it placed in a root directory of the project, you can easily add it to your project using gradle dependencies. Firstly you should place **opus.aar** in the libs folder of your project and then add to your build.gradle:
 ````groovy
 dependencies {
-    api fileTree(dir: 'libs', include: '*.jar')       // this line is necessary in order to gradle took opus.aar from "libs" dir
+    api fileTree(dir: 'libs', include: '*.jar')       // this line is necessary in order to allow gradle to take opus.aar from "libs" dir
     api files('libs/opus.aar')                        // dependency for opus.aar library
     ...                                               // other dependencies
 }
