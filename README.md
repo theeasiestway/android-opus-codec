@@ -64,7 +64,7 @@ codec.decoderRelease()
 - **opus** - here you can find a C++ class that interacts with [libopus 1.3.1](https://opus-codec.org/release/stable/2019/04/12/libopus-1_3_1.html) and JNI wrapper for interacting with it from Java/Kotlin layer.
 
 #### Compiled library:
-- **opus.aar** - it's a compiled library of **opus** module that mentioned above, it placed in a root directory of the project, you can easily add it to your project using gradle dependencies. Firstly you should place **opus.aar** in the libs folder of your project and then add to your build.gradle:
+- **opus.aar** - it's a compiled library of **opus** module that mentioned above, it placed in a root directory of the project, you can easily add it to your project using gradle dependencies. First you have to place **opus.aar** in the libs folder of your project and then add to your build.gradle the following:
 ````groovy
 dependencies {
     api fileTree(dir: 'libs', include: '*.jar')       // this line is necessary in order to allow gradle to take opus.aar from "libs" dir
