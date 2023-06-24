@@ -21,12 +21,23 @@ int CodecOpus::encoderInit(int sampleRate, int numChannels, int application) {
         return size;
     }
 
+    int error;
+
+    OggOpusComments *comments;
+    comments = ope_comments_create();
+    fileEncoder = (OggOpusEnc*) malloc((size_t) size);
+    fileEncoder = ope_encoder_create_file("/data/data/com.theeasiestway.opus/cache/rec.opus", comments, sampleRate, numChannels, 0, &error);
+    if (!fileEncoder) {
+        LOGE(TAG, "[encoderInit] couldn't open file");
+        free(fileEncoder);
+        return -1;
+    }
+
     encoder = (OpusEncoder*) malloc((size_t) size);
+    error = opus_encoder_init(encoder, sampleRate, numChannels, application);
 
-    int ret = opus_encoder_init(encoder, sampleRate, numChannels, application);
-
-    if (ret) {
-        LOGE(TAG, "[encoderInit] couldn't init encoder ret: %d; error: %s", ret, opus_strerror(ret));
+    if (error) {
+        LOGE(TAG, "[encoderInit] couldn't init encoder ret: %d; error: %s", error, opus_strerror(error));
         free(encoder);
         return -1;
     } else LOGD(TAG, "[encoderInit] encoder successfully initialized");
@@ -65,7 +76,9 @@ std::vector<uint8_t> CodecOpus::encode(uint8_t *bytes, int frameSize) {
     int maxBytesCount = sizeof(unsigned char) * 1024;
     unsigned char *outBuffer = (unsigned char*) malloc((size_t) maxBytesCount);
 
-    int resultLength = opus_encode(encoder, (opus_int16 *) bytes, frameSize, outBuffer, maxBytesCount);
+    int resultLength;
+    resultLength = ope_encoder_write(fileEncoder, (opus_int16 *) bytes, frameSize);
+    resultLength = opus_encode(encoder, (opus_int16 *) bytes, frameSize, outBuffer, maxBytesCount);
     if (resultLength <= 0) {
         LOGE(TAG, "[encode] error: %s", opus_strerror(resultLength));
         return result;
@@ -77,6 +90,10 @@ std::vector<uint8_t> CodecOpus::encode(uint8_t *bytes, int frameSize) {
 }
 
 void CodecOpus::encoderRelease() {
+    ope_encoder_drain(fileEncoder);
+    ope_encoder_destroy(fileEncoder);
+    fileEncoder = nullptr;
+
     if (encoder) opus_encoder_destroy(encoder);
     encoder = nullptr;
 }
